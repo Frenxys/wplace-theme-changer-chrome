@@ -1,3 +1,4 @@
+console.log('[ThemeChanger] Content script loaded');
       // Funzione per aggiornare l'icona dopo il cambio tema
       function refreshThemeIcon() {
         const theme = getLocalTheme();
@@ -17,6 +18,8 @@
   function createThemePopup() {
     // Set the selected theme when opening
     chrome.runtime.sendMessage({action: 'getTheme'}, function(response) {
+  console.log('[ThemeChanger] getTheme response:', response);
+  console.log('[ThemeChanger] setTheme response:', response);
       if (response && response.theme) {
         const themeSelect = popup.querySelector('#theme-select');
         if (themeSelect) themeSelect.value = response.theme;

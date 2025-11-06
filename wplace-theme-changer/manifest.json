@@ -4,8 +4,8 @@
   "manifest_version": 3,
   "description": "Easily override the Wplace map style with your own custom JSON theme.",
   "permissions": [
-    "webRequest",
-    "webRequestBlocking",
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback",
     "storage"
   ],
   "host_permissions": [
@@ -13,7 +13,7 @@
     "https://wplace.live/styles/*"
   ],
   "background": {
-    "scripts": ["background.js"]
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -29,13 +29,5 @@
     "48": "icon.png",
     "128": "icon.png"
   }
-  ,
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "wplace-theme-changer@github.com.Frenxys",
-      "data_collection_permissions": {
-        "required": ["none"]
-      }
-    }
-  }
+  
 }
