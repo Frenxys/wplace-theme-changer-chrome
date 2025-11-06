@@ -16,15 +16,6 @@ console.log('[ThemeChanger] Content script loaded');
   // Function to change SVG color, now global
 
   function createThemePopup() {
-    // Set the selected theme when opening
-    chrome.runtime.sendMessage({action: 'getTheme'}, function(response) {
-  console.log('[ThemeChanger] getTheme response:', response);
-  console.log('[ThemeChanger] setTheme response:', response);
-      if (response && response.theme) {
-        const themeSelect = popup.querySelector('#theme-select');
-        if (themeSelect) themeSelect.value = response.theme;
-      }
-    });
     if (document.getElementById('wplace-theme-popup')) return;
     const popup = document.createElement('div');
     popup.id = 'wplace-theme-popup';
@@ -64,20 +55,31 @@ console.log('[ThemeChanger] Content script loaded');
         <h3 style="margin: 0; font-size: 1.1em; font-weight: bold; flex: 1; text-align: center; padding-right: 32px;">Theme</h3>
         <button class="btn btn-circle btn-ghost" title="Close" style="width: 28px; height: 28px;">✕</button>
       </div>
-      <select id="theme-select" style="width:100%; padding:8px; border-radius:6px; background:#444; color:#fff; font-size:1em;">
-        <option value="acquerello">Acquerello</option>
-        <option value="aurora-boreale">Aurora Boreale</option>
-        <option value="cute">Cute</option>
-        <option value="dark">Dark</option>
-        <option value="halloween">Halloween</option>
-        <option value="liberty">Liberty</option>
-        <option value="pixel-art-retro">Pixel Art Retro</option>
-        <option value="positron">Positron</option>
-        <option value="purple">Purple</option>
-        <option value="rainbow">Rainbow</option>
-        <option value="space">Space</option>
-      </select>
+      <select id="theme-select" style="width:100%; padding:8px; border-radius:6px; background:#444; color:#fff; font-size:1em;"></select>
     `;
+
+    // Popola il dropdown con i temi da Firebase
+    fetch('https://wplacepixels-default-rtdb.europe-west1.firebasedatabase.app/themes.json')
+      .then(r => r.json())
+      .then(data => {
+        const themeSelect = popup.querySelector('#theme-select');
+        if (themeSelect && data && typeof data === 'object') {
+          themeSelect.innerHTML = '';
+          Object.entries(data).forEach(([key, value]) => {
+            const displayName = value.name || key;
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = displayName;
+            themeSelect.appendChild(option);
+          });
+          // Imposta il tema selezionato attuale
+          chrome.runtime.sendMessage({action: 'getTheme'}, function(response) {
+            if (response && response.theme) {
+              themeSelect.value = response.theme;
+            }
+          });
+        }
+      });
     popup.style.display = 'none';
     document.body.appendChild(popup);
     // Drag logic
